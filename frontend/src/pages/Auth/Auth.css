@@ -1,0 +1,124 @@
+:root {
+  --primary: #2563eb;
+  --secondary: #1e40af;
+  --highlight: #f59e0b;
+  --light: #f9fafb;
+  --dark: #111827;
+  --radius: 12px;
+  --text: #374151;
+  --error: #ef4444;
+}
+
+/* Container */
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 1rem;
+}
+
+.auth-card {
+  background: white;
+  padding: 2rem 2.5rem;
+  border-radius: var(--radius);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.auth-card h2 {
+  margin-bottom: 1.5rem;
+  color: var(--dark);
+}
+
+/* Form */
+.form-group {
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: var(--radius);
+  border: 1px solid #d1d5db;
+  font-size: 1rem;
+  transition: all 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 5px rgba(37,99,235,0.3);
+}
+
+/* Buttons */
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  border: none;
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.btn-primary:hover {
+  background: var(--secondary);
+}
+
+/* Error */
+.error-message {
+  background: var(--error);
+  color: white;
+  padding: 0.5rem;
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+}
+
+/* Link */
+.auth-link {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.auth-link a {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-link a:hover {
+  color: var(--secondary);
+  text-decoration: underline;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 1.5rem 1.8rem;
+  }
+}
