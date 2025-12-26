@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../../services/api';
+import './Auth.css';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
+  
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
@@ -42,116 +44,92 @@ const LoginPage = () => {
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      padding: '20px'
-    }}>
-      <div style={{
-        background: 'white',
-        padding: '2rem',
-        borderRadius: '10px',
-        boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
-        width: '100%',
-        maxWidth: '400px'
-      }}>
-        <h2 style={{ textAlign: 'center', marginBottom: '1.5rem', color: '#333' }}>
-          Connexion
-        </h2>
-        
-        {error && (
-          <div style={{
-            background: '#fee',
-            color: '#c53030',
-            padding: '0.75rem',
-            borderRadius: '5px',
-            marginBottom: '1rem',
-            border: '1px solid #feb2b2'
-          }}>
-            {error}
-          </div>
-        )}
-        
-        <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#555' }}>
-              Email
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              style={{
-                width: '100%',
-                padding: '0.75rem',
-                border: '1px solid #ddd',
-                borderRadius: '5px',
-                fontSize: '1rem'
-              }}
-              placeholder="votre@email.com"
-            />
-          </div>
-          
-          <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#555' }}>
-              Mot de passe
-            </label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              style={{
-                width: '100%',
-                padding: '0.75rem',
-                border: '1px solid #ddd',
-                borderRadius: '5px',
-                fontSize: '1rem'
-              }}
-              placeholder="Votre mot de passe"
-            />
-          </div>
-          
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              width: '100%',
-              padding: '0.75rem',
-              background: loading ? '#ccc' : '#667eea',
-              color: 'white',
-              border: 'none',
-              borderRadius: '5px',
-              fontSize: '1rem',
-              fontWeight: '600',
-              cursor: loading ? 'not-allowed' : 'pointer'
-            }}
-          >
-            {loading ? 'Connexion...' : 'Se connecter'}
-          </button>
-        </form>
-        
-        <p style={{ textAlign: 'center', marginTop: '1.5rem', color: '#666' }}>
-          Pas de compte ?{' '}
-          <Link to="/register" style={{ color: '#667eea', textDecoration: 'none' }}>
-            Créer un compte
+    <div className="auth-page">
+      {/* Navigation */}
+      <nav className="auth-nav">
+        <div className="nav-container">
+          <Link to="/" className="logo">
+            <span className="logo-icon">🎓</span>
+            <span className="logo-text">StageTrack</span>
           </Link>
-        </p>
+          <div className="nav-links">
+            <Link to="/" className="nav-link home-btn">
+              <span className="nav-icon">🏠</span>
+              Accueil
+            </Link>
+            <Link to="/register" className="nav-link">
+              <span className="nav-icon">📝</span>
+              Inscription
+            </Link>
+          </div>
+        </div>
+      </nav>
 
-        <div style={{ marginTop: '2rem', padding: '1rem', background: '#f8f9fa', borderRadius: '5px' }}>
-          <p style={{ margin: '0.25rem 0', fontSize: '0.9rem' }}>
+      <div className="auth-container">
+        <div className="auth-card">
+          {/* Logo et titre - Même design que RegisterPage */}
+          <div className="auth-header">
+            <div className="auth-logo">
+              <div className="auth-logo-icon">🎓</div>
+              <div className="auth-title">StageTrack</div>
+            </div>
+            <h2 className="auth-subtitle">Connexion</h2>
+            <p className="auth-description">
+              Connectez-vous pour accéder à votre compte
+            </p>
+          </div>
+
+          {error && <div className="error-message">{error}</div>}
+
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label>Adresse email</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="exemple@post.com"
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Mot de passe</label>
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Votre mot de passe"
+                required
+              />
+            </div>
+
+            <div className="form-options">
+              <Link to="/forgot-password" className="forgot-password">
+                Mot de passe oublié ?
+              </Link>
+            </div>
+
+            <button 
+              type="submit" 
+              className="btn-primary" 
+              disabled={loading}
+            >
+              {loading ? 'Connexion en cours...' : 'Se connecter'}
+            </button>
+          </form>
+
+          <p className="auth-link">
+            Pas encore de compte ? <Link to="/register" className="link-highlight">Créer un compte</Link>
           </p>
-          <p style={{ margin: '0.25rem 0', fontSize: '0.9rem' }}>
-          </p>
-          <p style={{ margin: '0.25rem 0', fontSize: '0.9rem' }}>
-            
-          </p>
+
+          <div className="auth-footer">
+            <Link to="/" className="link-highlight">
+              &larr; Retour à l'accueil
+            </Link>
+          </div>
         </div>
       </div>
     </div>
