@@ -9,9 +9,6 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// ============================================
-// 1. Postuler à une offre (étudiant)
-// ============================================
 exports.applyToOffer = async (req, res) => {
   try {
     console.log('📥 Body:', req.body);
@@ -105,9 +102,8 @@ exports.applyToOffer = async (req, res) => {
   }
 };
 
-// ============================================
-// 2. Récupérer les candidatures de l'étudiant
-// ============================================
+
+// Récupérer les candidatures de l'étudiant
 exports.getStudentApplications = async (req, res) => {
   try {
     const studentId = req.user?._id || req.user?.id;
@@ -127,9 +123,8 @@ exports.getStudentApplications = async (req, res) => {
   }
 };
 
-// ============================================
-// 3. Récupérer les candidatures pour une entreprise
-// ============================================
+
+// Récupérer les candidatures pour une entreprise
 exports.getCompanyApplications = async (req, res) => {
   try {
     const companyId = req.user?._id || req.user?.id;
