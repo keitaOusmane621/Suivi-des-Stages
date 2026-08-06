@@ -1,93 +1,114 @@
 const User = require('../models/User');
-const Student = require('../models/Student');
-const Company = require('../models/Company');
 const Offer = require('../models/Offer');
 const Application = require('../models/Application');
 
-// Dans getDashboardStats, ajoutez :
+// ============================================
+// 1. Statistiques du tableau de bord
+// ============================================
 exports.getDashboardStats = async (req, res) => {
   try {
-    const totalStudents = await Student.countDocuments();
-    const totalCompanies = await Company.countDocuments();
-    const totalOffers = await Offer.countDocuments();
-    const totalApplications = await Application.countDocuments();
-    const pendingApplications = await Application.countDocuments({ status: 'pending' });
-    const acceptedApplications = await Application.countDocuments({ status: 'accepted' });
-    const rejectedApplications = await Application.countDocuments({ status: 'rejected' });
+    const [totalStudents, totalCompanies, totalOffers, totalApplications] = await Promise.all([
+      User.countDocuments({ role: 'student' }),
+      User.countDocuments({ role: 'company' }),
+      Offer.countDocuments(),
+      Application.countDocuments(),
+    ]);
 
     res.json({
       totalStudents,
       totalCompanies,
       totalOffers,
       totalApplications,
-      pendingApplications,
-      acceptedApplications,
-      rejectedApplications
     });
   } catch (error) {
+    console.error('❌ Erreur getDashboardStats:', error);
     res.status(500).json({ message: error.message });
   }
 };
 
-// Lister tous les utilisateurs
-exports.getAllUsers = async (req, res) => {
+// ============================================
+// 2. Récupérer tous les utilisateurs
+// ============================================
+exports.getUsers = async (req, res) => {
   try {
-    const users = await User.find().select('-password');
+    const users = await User.find().select('-password').sort({ createdAt: -1 });
     res.json(users);
   } catch (error) {
+    console.error('❌ Erreur getUsers:', error);
     res.status(500).json({ message: error.message });
   }
 };
 
-// Désactiver/supprimer un utilisateur
-exports.manageUser = async (req, res) => {
+// ============================================
+// 3. Activer / désactiver un utilisateur
+// ============================================
+exports.updateUserStatus = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    const { userId } = req.params;
+    const { action } = req.body; // 'enable' ou 'disable'
+
+    const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ message: 'Utilisateur non trouvé' });
+      return res.status(404).json({ message: 'Utilisateur introuvable' });
     }
 
-    if (req.body.action === 'disable') {
-      user.active = false;
-      await user.save();
-      res.json({ message: 'Utilisateur désactivé' });
-    } else if (req.body.action === 'enable') {
+    if (action === 'enable') {
       user.active = true;
-      await user.save();
-      res.json({ message: 'Utilisateur activé' });
-    } else if (req.body.action === 'delete') {
-      await User.findByIdAndDelete(req.params.id);
-      
-      // Supprimer aussi le profil associé
-      if (user.role === 'student') {
-        await Student.findOneAndDelete({ userId: req.params.id });
-      } else if (user.role === 'company') {
-        await Company.findOneAndDelete({ userId: req.params.id });
-        // Supprimer aussi les offres de l'entreprise
-        await Offer.deleteMany({ companyId: req.params.id });
-      }
-      
-      res.json({ message: 'Utilisateur supprimé' });
+    } else if (action === 'disable') {
+      user.active = false;
+    } else if (action === 'delete') {
+      await user.deleteOne();
+      return res.json({ message: 'Utilisateur supprimé' });
+    } else {
+      return res.status(400).json({ message: 'Action non supportée' });
     }
+
+    await user.save();
+    res.json({ message: `Utilisateur ${action === 'enable' ? 'activé' : 'désactivé'} avec succès` });
   } catch (error) {
+    console.error('❌ Erreur updateUserStatus:', error);
     res.status(500).json({ message: error.message });
   }
 };
 
-// Gérer les offres (supprimer offres inappropriées)
-exports.manageOffers = async (req, res) => {
+// ============================================
+// 4. Récupérer toutes les offres (admin)
+// ============================================
+exports.getOffers = async (req, res) => {
   try {
-    if (req.body.action === 'delete') {
-      await Offer.findByIdAndDelete(req.params.id);
-      res.json({ message: 'Offre supprimée' });
-    } else if (req.body.action === 'deactivate') {
-      await Offer.findByIdAndUpdate(req.params.id, { active: false });
-      res.json({ message: 'Offre désactivée' });
-    } else if (req.body.action === 'activate') {
-      await Offer.findByIdAndUpdate(req.params.id, { active: true });
-      res.json({ message: 'Offre activée' });
-    }
+    const offers = await Offer.find().populate('companyId', 'name email').sort({ createdAt: -1 });
+    res.json(offers);
   } catch (error) {
+    console.error('❌ Erreur getOffers:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// ============================================
+// 5. Activer / désactiver une offre (admin)
+// ============================================
+exports.updateOfferStatus = async (req, res) => {
+  try {
+    const { offerId } = req.params;
+    const { action } = req.body; // 'activate' ou 'deactivate'
+
+    const offer = await Offer.findById(offerId);
+    if (!offer) {
+      return res.status(404).json({ message: 'Offre introuvable' });
+    }
+
+    if (action === 'activate') {
+      offer.active = true;
+    } else if (action === 'deactivate') {
+      offer.active = false;
+    } else {
+      return res.status(400).json({ message: 'Action non supportée' });
+    }
+
+    await offer.save();
+    res.json({ message: `Offre ${action === 'activate' ? 'activée' : 'désactivée'} avec succès` });
+  } catch (error) {
+    console.error('❌ Erreur updateOfferStatus:', error);
     res.status(500).json({ message: error.message });
   }
 };

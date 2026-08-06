@@ -1,0 +1,241 @@
+.apply-page {
+  min-height: 100vh;
+  background: var(--bg-body);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+.apply-container {
+  max-width: 700px;
+  width: 100%;
+  background: var(--bg-card);
+  padding: 2.5rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-color);
+}
+.apply-container h1 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: var(--text-primary);
+  text-align: center;
+}
+.offer-summary {
+  background: var(--bg-secondary);
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  margin-bottom: 2rem;
+  border-left: 4px solid var(--primary);
+}
+.offer-summary h2 {
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+}
+.offer-summary p {
+  color: var(--text-secondary);
+  margin: 0.25rem 0;
+}
+.apply-form .form-group {
+  margin-bottom: 1.5rem;
+}
+.apply-form label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  color: var(--text-primary);
+}
+.required {
+  color: #ef4444;
+  font-weight: bold;
+}
+.apply-form input[type="file"] {
+  display: block;
+  width: 100%;
+  padding: 0.6rem;
+  border: 2px dashed var(--border-color);
+  border-radius: var(--radius);
+  background: var(--bg-secondary);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.apply-form input[type="file"]:hover {
+  border-color: var(--primary);
+}
+.apply-form textarea {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  background: var(--bg-body);
+  color: var(--text-primary);
+  resize: vertical;
+  font-family: inherit;
+}
+.error-message {
+  color: #ef4444;
+  font-size: 0.9rem;
+  margin-top: 0.3rem;
+  display: block;
+}
+.btn-submit {
+  width: 100%;
+  padding: 0.9rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.btn-submit:hover:not(:disabled) {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+}
+.btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.apply-loading, .apply-error {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.2rem;
+}
+
+.apply-page {
+  min-height: 100vh;
+  background: var(--bg-body);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+.apply-container {
+  max-width: 700px;
+  width: 100%;
+  background: var(--bg-card);
+  padding: 2.5rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-color);
+}
+.apply-container h1 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: var(--text-primary);
+  text-align: center;
+}
+.offer-summary {
+  background: var(--bg-secondary);
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  margin-bottom: 2rem;
+  border-left: 4px solid var(--primary);
+}
+.offer-summary h2 {
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+}
+.offer-summary p {
+  color: var(--text-secondary);
+  margin: 0.25rem 0;
+}
+.apply-form .form-group {
+  margin-bottom: 1.5rem;
+}
+.apply-form label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  color: var(--text-primary);
+}
+.required {
+  color: #ef4444;
+  font-weight: bold;
+}
+.apply-form input[type="file"] {
+  display: block;
+  width: 100%;
+  padding: 0.6rem;
+  border: 2px dashed var(--border-color);
+  border-radius: var(--radius);
+  background: var(--bg-secondary);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.apply-form input[type="file"]:hover {
+  border-color: var(--primary);
+}
+.apply-form textarea {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  background: var(--bg-body);
+  color: var(--text-primary);
+  resize: vertical;
+  font-family: inherit;
+}
+.error-message {
+  color: #ef4444;
+  font-size: 0.9rem;
+  margin-top: 0.3rem;
+  display: block;
+}
+.btn-submit {
+  width: 100%;
+  padding: 0.9rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.btn-submit:hover:not(:disabled) {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+}
+.btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.apply-loading, .apply-error {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.2rem;
+}
+
+.already-applied-card {
+  text-align: center;
+  padding: 2rem;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  border: 2px solid #22c55e;
+}
+.already-applied-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+.already-applied-card h2 {
+  color: #22c55e;
+  margin-bottom: 0.5rem;
+}
+.already-applied-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+.already-applied-actions .btn-secondary {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  padding: 0.6rem 1.5rem;
+  border-radius: var(--radius);
+  text-decoration: none;
+  border: 1px solid var(--border-color);
+}

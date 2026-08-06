@@ -1124,3 +1124,381 @@ body {
     font-size: 0.7rem;
   }
 }
+/* Styles pour la notification */
+.notification-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white;
+  font-size: 1.2rem;
+  text-decoration: none;
+}
+
+.notification-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.notification-icon {
+  font-size: 1.2rem;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #ef4444;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 600;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Badge de notification dans les onglets */
+.tab-badge.notification {
+  background: #ef4444;
+  animation: pulse 2s infinite;
+}
+
+/* Carte de statistique avec lien */
+.stat-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #1e40af;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.stat-link:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+/* Carte mise en évidence */
+.stat-card.highlight {
+  border: 2px solid #1e40af;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+}
+
+.stat-card.highlight .stat-card-header {
+  background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
+  color: white;
+}
+
+.stat-card.highlight .stat-card-body p {
+  color: #374151;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0.5rem 0;
+}
+
+/* Bouton de messagerie dans les actions */
+.btn-info {
+  padding: 0.4rem 0.8rem;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.btn-info:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+/* Animation pour les nouvelles notifications */
+@keyframes shake {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-15deg); }
+  75% { transform: rotate(15deg); }
+}
+
+.notification-btn.has-new .notification-icon {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* Styles responsifs */
+@media (max-width: 768px) {
+  .notification-btn {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .notification-badge {
+    min-width: 16px;
+    height: 16px;
+    font-size: 0.6rem;
+    top: -3px;
+    right: -3px;
+  }
+  
+  .stat-card.highlight {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Style pour l'onglet messages dans la navigation */
+.nav-tab[onclick*="messaging"] {
+  position: relative;
+}
+
+.nav-tab[onclick*="messaging"] .tab-badge.notification {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+}
+
+/* =============================================
+   THÈME SOMBRE
+   ============================================= */
+.dark-theme {
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-card: #1e293b;
+  --bg-section: #1e293b;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-light: #64748b;
+  --border-color: #334155;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 6px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+.dark-theme .dashboard-header {
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+}
+
+.dark-theme .nav-tab {
+  color: var(--text-secondary);
+  border-color: var(--border-color);
+}
+.dark-theme .nav-tab:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+.dark-theme .nav-tab.active {
+  background: var(--primary);
+  color: white;
+}
+
+.dark-theme .stat-card {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+}
+.dark-theme .stat-card:nth-child(1) .stat-icon {
+  background: rgba(37, 99, 235, 0.2);
+}
+.dark-theme .stat-card:nth-child(2) .stat-icon {
+  background: rgba(22, 163, 74, 0.2);
+}
+.dark-theme .stat-card:nth-child(3) .stat-icon {
+  background: rgba(245, 158, 11, 0.2);
+}
+.dark-theme .stat-card:nth-child(4) .stat-icon {
+  background: rgba(37, 99, 235, 0.2);
+}
+
+.dark-theme .stat-card.highlight {
+  border-color: #2563eb;
+  background: linear-gradient(135deg, #1e293b 0%, #1e3a5f 100%);
+}
+
+.dark-theme .table-container {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+}
+.dark-theme .table-header {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+.dark-theme .users-table th,
+.dark-theme .offers-table th {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+}
+.dark-theme .users-table td,
+.dark-theme .offers-table td {
+  border-color: var(--border-color);
+}
+.dark-theme .users-table tbody tr:hover,
+.dark-theme .offers-table tbody tr:hover {
+  background: rgba(37, 99, 235, 0.05);
+}
+
+.dark-theme .filter-btn {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border-color: var(--border-color);
+}
+.dark-theme .filter-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.dark-theme .chart-section {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+}
+.dark-theme .chart-card {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+.dark-theme .chart-card h4 {
+  color: var(--text-primary);
+}
+
+.dark-theme .dashboard-footer {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+.dark-theme .dashboard-footer p {
+  color: var(--text-secondary);
+}
+
+/* =============================================
+   NOUVEAUX COMPOSANTS
+   ============================================= */
+.theme-toggle-btn {
+  background: rgba(255,255,255,0.1);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: var(--transition);
+  color: white;
+}
+.theme-toggle-btn:hover {
+  background: rgba(255,255,255,0.2);
+  transform: scale(1.05);
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+.chart-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+}
+.chart-card.full-width {
+  grid-column: 1 / -1;
+}
+.chart-card h4 {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.messages-placeholder {
+  background: var(--bg-section);
+  border-radius: var(--border-radius-lg);
+  padding: 3rem;
+  text-align: center;
+  border: 1px solid var(--border-color);
+}
+.messages-placeholder h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+.messages-placeholder p {
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+}
+.btn-primary {
+  display: inline-block;
+  background: var(--primary);
+  color: white;
+  padding: 0.75rem 2rem;
+  border-radius: var(--border-radius);
+  text-decoration: none;
+  font-weight: 500;
+  transition: var(--transition);
+}
+.btn-primary:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.admin-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 1rem;
+}
+.admin-error h3 {
+  color: #dc2626;
+}
+.admin-error .btn-retry {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-weight: 500;
+  transition: var(--transition);
+}
+.admin-error .btn-retry:hover {
+  background: var(--primary-dark);
+}
+
+/* Ajustements responsifs pour les graphiques */
+@media (max-width: 768px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+  .chart-card.full-width {
+    grid-column: 1;
+  }
+}

@@ -1,19 +1,26 @@
 const express = require('express');
-const { 
-  getDashboardStats, 
-  getAllUsers, 
-  manageUser, 
-  manageOffers 
-} = require('../controllers/adminController');
-const { protect, authorize } = require('../middleware/auth');
 const router = express.Router();
+const { protect, authorize } = require('../middleware/auth');
+const {
+  getDashboardStats,
+  getUsers,
+  updateUserStatus,
+  getOffers,
+  updateOfferStatus,
+} = require('../controllers/adminController');
 
-// Toutes les routes admin nécessitent le rôle admin
+// Toutes les routes admin sont protégées par le rôle 'admin'
 router.use(protect, authorize('admin'));
 
+// Statistiques du tableau de bord
 router.get('/dashboard-stats', getDashboardStats);
-router.get('/users', getAllUsers);
-router.put('/users/:id', manageUser);
-router.put('/offers/:id', manageOffers);
+
+// Gestion des utilisateurs
+router.get('/users', getUsers);
+router.put('/users/:userId', updateUserStatus);
+
+// Gestion des offres
+router.get('/offers', getOffers);
+router.put('/offers/:offerId', updateOfferStatus);
 
 module.exports = router;

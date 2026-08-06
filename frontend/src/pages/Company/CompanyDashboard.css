@@ -1070,3 +1070,338 @@ button.disabled:hover {
     justify-content: center;
   }
 }
+/* Styles pour la notification dans CompanyDashboard.css */
+
+/* Bouton de notification */
+.notification-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white;
+  font-size: 1.2rem;
+  text-decoration: none;
+}
+
+.notification-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.notification-icon {
+  font-size: 1.2rem;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #ef4444;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 600;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Badge de notification dans les onglets */
+.tab-badge.notification {
+  background: #ef4444;
+  animation: pulse 2s infinite;
+}
+
+/* Carte de messagerie rapide */
+.quick-message-card {
+  margin-bottom: 2rem;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-left: 4px solid #1e40af;
+}
+
+.quick-message-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.message-icon {
+  font-size: 2rem;
+}
+
+.quick-message-card h3 {
+  color: #1e40af;
+  margin: 0;
+}
+
+.quick-message-card p {
+  color: #4b5563;
+  margin-bottom: 1.5rem;
+}
+
+.quick-message-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.unread-notice {
+  background: #fef3c7;
+  color: #92400e;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Guide de messagerie */
+.message-guide {
+  margin-bottom: 2rem;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+}
+
+.guide-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.guide-icon {
+  font-size: 1.5rem;
+  color: #ea580c;
+}
+
+.guide-list {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+}
+
+.guide-list li {
+  margin-bottom: 0.5rem;
+  color: #4b5563;
+}
+
+.guide-actions {
+  margin-top: 1.5rem;
+}
+
+/* Bouton de message dans les actions */
+.btn-primary, .btn-info {
+  padding: 0.4rem 0.8rem;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.btn-primary:hover, .btn-info:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+/* Statistiques dans le header */
+.header-stats {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e40af;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Animation pour les nouvelles notifications */
+@keyframes shake {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-15deg); }
+  75% { transform: rotate(15deg); }
+}
+
+.notification-btn.has-new .notification-icon {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* Styles responsifs */
+@media (max-width: 768px) {
+  .notification-btn {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .notification-badge {
+    min-width: 16px;
+    height: 16px;
+    font-size: 0.6rem;
+    top: -3px;
+    right: -3px;
+  }
+  
+  .header-stats {
+    display: none;
+  }
+  
+  .quick-message-actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Style pour l'onglet messages dans la navigation */
+.nav-tab[onclick*="messaging"] {
+  position: relative;
+}
+
+.nav-tab[onclick*="messaging"] .tab-badge.notification {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+}
+
+/* Bouton dans le footer pour la messagerie */
+.footer-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #1e40af;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.footer-link:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+/* Style pour les boutons d'action dans les cartes */
+.offer-actions, .action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Bouton message spécifique */
+.btn-primary[class*="message"] {
+  background: #059669;
+}
+
+.btn-primary[class*="message"]:hover {
+  background: #10b981;
+}
+
+/* Statut de notification dans les statistiques */
+.stats-summary {
+  display: flex;
+  gap: 1.5rem;
+}
+
+/* Status des candidatures */
+.status-badge.status-pending {
+  background: #fbbf24;
+  color: #1e293b;
+}
+.status-badge.status-accepted {
+  background: #22c55e;
+  color: white;
+}
+.status-badge.status-rejected {
+  background: #ef4444;
+  color: white;
+}
+
+/* Fichiers de candidature */
+.application-files {
+  display: flex;
+  gap: 2rem;
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  margin: 0.75rem 0;
+  flex-wrap: wrap;
+}
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.file-icon {
+  font-size: 1.2rem;
+}
+.file-label {
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+.btn-file {
+  padding: 0.2rem 0.8rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: var(--transition);
+}
+.btn-file:hover {
+  background: var(--primary-dark);
+}
+.file-missing {
+  font-size: 0.85rem;
+  color: var(--text-light);
+}
+
+/* Désactivation des boutons d'action */
+.btn-success.disabled, .btn-danger.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}

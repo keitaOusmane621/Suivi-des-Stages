@@ -1,7 +1,7 @@
 const Offer = require('../models/Offer');
 const Company = require('../models/Company');
 
-// Créer une offre de stage
+// Créer une offre
 exports.createOffer = async (req, res) => {
   try {
     const company = await Company.findOne({ userId: req.user._id });
@@ -20,10 +20,26 @@ exports.createOffer = async (req, res) => {
   }
 };
 
-// Récupérer toutes les offres
+// Récupérer les offres de l'entreprise connectée
+exports.getCompanyOffers = async (req, res) => {
+  try {
+    const company = await Company.findOne({ userId: req.user._id });
+    if (!company) {
+      return res.status(404).json({ message: 'Entreprise non trouvée' });
+    }
+
+    const offers = await Offer.find({ companyId: company._id })
+      .sort({ createdAt: -1 });
+    res.json(offers);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Récupérer toutes les offres actives (pour les étudiants)
 exports.getAllOffers = async (req, res) => {
   try {
-    const offers = await Offer.find()
+    const offers = await Offer.find({ active: true })
       .populate('companyId', 'name sector address')
       .sort({ createdAt: -1 });
     res.json(offers);

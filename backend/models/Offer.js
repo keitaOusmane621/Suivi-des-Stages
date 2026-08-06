@@ -1,28 +1,19 @@
 const mongoose = require('mongoose');
 
 const offerSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: true
-  },
-  description: {
-    type: String,
-    required: true
-  },
   companyId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Company',
+    ref: 'User',
     required: true
   },
-  domain: String,
-  location: String,
-  duration: String, // Durée du stage
-  startDate: Date,
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  domain: { type: String, required: true },
+  location: { type: String, required: true },
+  duration: { type: String, required: true },
   skillsRequired: [String],
-  active: {
-    type: Boolean,
-    default: true
-  }
+  remuneration: { type: Number, min: 0 },
+  active: { type: Boolean, default: true }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Offer', offerSchema);

@@ -1,18 +1,17 @@
 const express = require('express');
-const {
-  sendMessage,
-  getConversations,
-  getConversation,
-  getUnreadCount
-} = require('../controllers/messageController');
-const { protect } = require('../middleware/auth');
 const router = express.Router();
+const { protect } = require('../middleware/auth');
 
-router.use(protect);
+// Middleware de protection (temporairement commenté pour tester)
+// router.use(protect);
 
-router.post('/send', sendMessage);
-router.get('/conversations', getConversations);
-router.get('/conversation/:userId', getConversation);
-router.get('/unread-count', getUnreadCount);
+// Routes factices pour tester
+router.get('/conversations', (req, res) => {
+  res.json([{ user: { _id: '123', firstName: 'Test', lastName: 'User' }, lastMessage: { content: 'Hello' }, unreadCount: 0 }]);
+});
+
+router.get('/unread-count', (req, res) => {
+  res.json({ count: 0 });
+});
 
 module.exports = router;

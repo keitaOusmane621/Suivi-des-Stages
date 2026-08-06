@@ -1,440 +1,301 @@
-import React, { useState, useEffect } from 'react';
+// ================================================================
+// ADMIN DASHBOARD - Version Professionnelle
+// ================================================================
+// Technologies : React 18+, Recharts, React Hot Toast, Hooks personnalisés
+// ================================================================
+
+import React, { useState, useEffect, useReducer, useCallback, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { toast, Toaster } from 'react-hot-toast';
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+  ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line
+} from 'recharts';
 import api from '../../services/api';
 import './AdminDashboard.css';
 
+// ---------- Composants internes (découpage) ----------
+import DashboardHeader from './DashboardHeader';
+import NotificationBell from './NotificationBell';
+import StatisticsCards from './StatisticsCards';
+import StatisticsChart from './StatisticsChart';
+import UsersTable from './UsersTable';
+import OffersTable from './OffersTable';
+import LoadingSpinner from "../../components/common/LoadingSpinner";
+
+// ---------- Réducer pour gérer l'état du tableau de bord ----------
+const initialState = {
+  stats: { totalStudents: 0, totalCompanies: 0, totalOffers: 0, totalApplications: 0 },
+  users: [],
+  offers: [],
+  loading: true,
+  error: null,
+  unreadMessages: 0,
+  selectedTab: 'stats',
+  isDarkMode: false,
+};
+
+function dashboardReducer(state, action) {
+  switch (action.type) {
+    case 'SET_DATA':
+      return { ...state, ...action.payload, loading: false, error: null };
+    case 'SET_LOADING':
+      return { ...state, loading: action.payload };
+    case 'SET_ERROR':
+      return { ...state, error: action.payload, loading: false };
+    case 'SET_TAB':
+      return { ...state, selectedTab: action.payload };
+    case 'SET_UNREAD_MESSAGES':
+      return { ...state, unreadMessages: action.payload };
+    case 'TOGGLE_THEME':
+      return { ...state, isDarkMode: !state.isDarkMode };
+    default:
+      return state;
+  }
+}
+
+// ================================================================
+// COMPOSANT PRINCIPAL
+// ================================================================
 const AdminDashboard = () => {
-  const [stats, setStats] = useState({});
-  const [users, setUsers] = useState([]);
-  const [offers, setOffers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedTab, setSelectedTab] = useState('stats');
-  
   const navigate = useNavigate();
+  const [state, dispatch] = useReducer(dashboardReducer, initialState);
   const user = JSON.parse(localStorage.getItem('user'));
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
+  // ---------- Récupération des données ----------
+  const fetchDashboardData = useCallback(async () => {
     try {
-      const [statsResponse, usersResponse, offersResponse] = await Promise.all([
+      dispatch({ type: 'SET_LOADING', payload: true });
+      const [statsRes, usersRes, offersRes] = await Promise.all([
         api.get('/admin/dashboard-stats'),
         api.get('/admin/users'),
         api.get('/offers')
       ]);
-      
-      setStats(statsResponse.data);
-      setUsers(usersResponse.data);
-      setOffers(offersResponse.data);
+      dispatch({
+        type: 'SET_DATA',
+        payload: {
+          stats: statsRes.data,
+          users: usersRes.data,
+          offers: offersRes.data,
+        }
+      });
     } catch (error) {
-      console.error('Erreur:', error);
-      alert('Accès non autorisé');
-      navigate('/login');
-    } finally {
-      setLoading(false);
+      dispatch({ type: 'SET_ERROR', payload: error.response?.data?.message || 'Erreur de chargement' });
+      toast.error('Impossible de charger les données');
+      if (error.response?.status === 401) {
+        navigate('/login');
+      }
     }
-  };
+  }, [navigate]);
 
+  // ---------- Récupération des messages non lus (avec polling) ----------
+  const fetchUnreadMessages = useCallback(async () => {
+    try {
+      // Simule un appel API ; à remplacer par un vrai appel
+      const mockUnread = Math.floor(Math.random() * 5);
+      // const response = await api.get('/messages/unread-count');
+      dispatch({ type: 'SET_UNREAD_MESSAGES', payload: mockUnread });
+    } catch (err) {
+      console.error('Erreur messages non lus:', err);
+    }
+  }, []);
+
+  // ---------- Effet au montage ----------
+  useEffect(() => {
+    fetchDashboardData();
+    fetchUnreadMessages();
+    const interval = setInterval(fetchUnreadMessages, 30000);
+    return () => clearInterval(interval);
+  }, [fetchDashboardData, fetchUnreadMessages]);
+
+  // ---------- Handlers ----------
   const handleUserAction = async (userId, action) => {
     try {
       await api.put(`/admin/users/${userId}`, { action });
-      alert(`Utilisateur ${action === 'disable' ? 'désactivé' : 'activé'} avec succès`);
-      fetchData();
+      const actionLabel = action === 'disable' ? 'désactivé' : action === 'enable' ? 'activé' : 'supprimé';
+      toast.success(`Utilisateur ${actionLabel} avec succès`);
+      fetchDashboardData();
     } catch (error) {
-      alert(error.response?.data?.message || 'Erreur lors de l\'action');
+      toast.error(error.response?.data?.message || 'Action impossible');
     }
   };
 
   const handleOfferAction = async (offerId, action) => {
     try {
       await api.put(`/admin/offers/${offerId}`, { action });
-      alert(`Offre ${action === 'deactivate' ? 'désactivée' : 'activée'} avec succès`);
-      fetchData();
+      const actionLabel = action === 'deactivate' ? 'désactivée' : 'activée';
+      toast.success(`Offre ${actionLabel} avec succès`);
+      fetchDashboardData();
     } catch (error) {
-      alert(error.response?.data?.message || 'Erreur lors de l\'action');
+      toast.error(error.response?.data?.message || 'Action impossible');
     }
   };
 
+  const handleTabChange = (tab) => dispatch({ type: 'SET_TAB', payload: tab });
+  const toggleTheme = () => dispatch({ type: 'TOGGLE_THEME' });
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     navigate('/login');
+    toast.success('Déconnexion réussie');
   };
 
-  if (loading) {
+  // ---------- Données préparées pour les graphiques ----------
+  const chartData = useMemo(() => [
+    { name: 'Étudiants', value: state.stats.totalStudents || 0 },
+    { name: 'Entreprises', value: state.stats.totalCompanies || 0 },
+    { name: 'Offres', value: state.stats.totalOffers || 0 },
+    { name: 'Candidatures', value: state.stats.totalApplications || 0 },
+  ], [state.stats]);
+
+  // ---------- Rendu ----------
+  if (state.loading) {
     return (
-      <div className="loading-screen">
-        <div className="spinner"></div>
+      <div className="admin-loading">
+        <LoadingSpinner />
         <p>Chargement du tableau de bord...</p>
       </div>
     );
   }
 
-  return (
-    <div className="dashboard-container">
-      {/* Header amélioré avec navigation */}
-      <header className="dashboard-header">
-        <div className="header-left">
-          <div className="logo">
-            <span className="logo-icon">🎓</span>
-            <span className="logo-text">StageTrack Admin</span>
-          </div>
-        </div>
-        
-        <div className="header-center">
-          <h1>Tableau de Bord Administrateur</h1>
-        </div>
-        
-        <div className="header-right">
-          <div className="user-info">
-            <span className="user-avatar">👤</span>
-            <span className="user-email">{user?.email}</span>
-          </div>
-          
-          <div className="header-actions">
-            <Link to="/" className="home-btn">
-              <span className="btn-icon">🏠</span>
-              Accueil
-            </Link>
-            <button onClick={handleLogout} className="logout-btn">
-              <span className="btn-icon">🚪</span>
-              Déconnexion
-            </button>
-          </div>
-        </div>
-      </header>
+  if (state.error) {
+    return (
+      <div className="admin-error">
+        <h3>⚠️ Une erreur est survenue</h3>
+        <p>{state.error}</p>
+        <button onClick={fetchDashboardData} className="btn-retry">Réessayer</button>
+      </div>
+    );
+  }
 
-      {/* Navigation principale */}
+  return (
+    <div className={`admin-dashboard ${state.isDarkMode ? 'dark-theme' : ''}`}>
+      <Toaster position="top-right" />
+      
+      {/* En-tête avec notifications et thème */}
+      <DashboardHeader
+        user={user}
+        unreadMessages={state.unreadMessages}
+        onLogout={handleLogout}
+        onToggleTheme={toggleTheme}
+        isDarkMode={state.isDarkMode}
+      />
+
+      {/* Navigation par onglets */}
       <nav className="dashboard-nav">
-        <div className="nav-tabs">
-          <button 
-            className={`nav-tab ${selectedTab === 'stats' ? 'active' : ''}`}
-            onClick={() => setSelectedTab('stats')}
-          >
-            <span className="tab-icon">📊</span>
-            <span className="tab-text">Statistiques</span>
-            {stats.totalStudents && <span className="tab-badge">{stats.totalStudents + stats.totalCompanies || 0}</span>}
-          </button>
-          
-          <button 
-            className={`nav-tab ${selectedTab === 'users' ? 'active' : ''}`}
-            onClick={() => setSelectedTab('users')}
-          >
-            <span className="tab-icon">👥</span>
-            <span className="tab-text">Utilisateurs</span>
-            {users.length > 0 && <span className="tab-badge">{users.length}</span>}
-          </button>
-          
-          <button 
-            className={`nav-tab ${selectedTab === 'offers' ? 'active' : ''}`}
-            onClick={() => setSelectedTab('offers')}
-          >
-            <span className="tab-icon">💼</span>
-            <span className="tab-text">Offres</span>
-            {offers.length > 0 && <span className="tab-badge">{offers.length}</span>}
-          </button>
-        </div>
+        <button
+          className={`nav-tab ${state.selectedTab === 'stats' ? 'active' : ''}`}
+          onClick={() => handleTabChange('stats')}
+        >
+          <span className="tab-icon">📊</span> Statistiques
+        </button>
+        <button
+          className={`nav-tab ${state.selectedTab === 'users' ? 'active' : ''}`}
+          onClick={() => handleTabChange('users')}
+        >
+          <span className="tab-icon">👥</span> Utilisateurs
+          <span className="tab-badge">{state.users.length}</span>
+        </button>
+        <button
+          className={`nav-tab ${state.selectedTab === 'offers' ? 'active' : ''}`}
+          onClick={() => handleTabChange('offers')}
+        >
+          <span className="tab-icon">💼</span> Offres
+          <span className="tab-badge">{state.offers.length}</span>
+        </button>
+        <button
+          className={`nav-tab ${state.selectedTab === 'messages' ? 'active' : ''}`}
+          onClick={() => navigate('/messaging')}
+        >
+          <span className="tab-icon">💬</span> Messages
+          {state.unreadMessages > 0 && (
+            <span className="tab-badge notification">{state.unreadMessages}</span>
+          )}
+        </button>
       </nav>
 
       {/* Contenu principal */}
       <main className="dashboard-content">
-        {/* Section Statistiques */}
-        {selectedTab === 'stats' && (
-          <div className="stats-section">
-            <div className="section-header">
-              <h2>📊 Vue d'ensemble</h2>
-              <p>Statistiques globales de la plateforme</p>
-            </div>
-            
-            {/* Cartes de statistiques */}
-            <div className="stats-grid">
-              <div className="stat-card">
-                <div className="stat-card-header">
-                  <span className="stat-icon">👨‍🎓</span>
-                  <h3>Étudiants</h3>
-                </div>
-                <div className="stat-card-body">
-                  <span className="stat-value">{stats.totalStudents || 0}</span>
-                  <span className="stat-label">Inscrits sur la plateforme</span>
-                </div>
-                <div className="stat-card-footer">
-                  <span className="stat-trend positive">+12% ce mois</span>
-                </div>
-              </div>
+        {state.selectedTab === 'stats' && (
+          <>
+            <section className="stats-overview">
+              <header className="section-header">
+                <h2>📈 Vue d'ensemble de la plateforme</h2>
+                <p>Statistiques en temps réel et tendances</p>
+              </header>
               
-              <div className="stat-card">
-                <div className="stat-card-header">
-                  <span className="stat-icon">🏢</span>
-                  <h3>Entreprises</h3>
-                </div>
-                <div className="stat-card-body">
-                  <span className="stat-value">{stats.totalCompanies || 0}</span>
-                  <span className="stat-label">Entreprises partenaires</span>
-                </div>
-                <div className="stat-card-footer">
-                  <span className="stat-trend positive">+8% ce mois</span>
-                </div>
-              </div>
-              
-              <div className="stat-card">
-                <div className="stat-card-header">
-                  <span className="stat-icon">📋</span>
-                  <h3>Offres</h3>
-                </div>
-                <div className="stat-card-body">
-                  <span className="stat-value">{stats.totalOffers || 0}</span>
-                  <span className="stat-label">Offres publiées</span>
-                </div>
-                <div className="stat-card-footer">
-                  <span className="stat-trend positive">+15% ce mois</span>
-                </div>
-              </div>
-              
-              <div className="stat-card">
-                <div className="stat-card-header">
-                  <span className="stat-icon">📨</span>
-                  <h3>Candidatures</h3>
-                </div>
-                <div className="stat-card-body">
-                  <span className="stat-value">{stats.totalApplications || 0}</span>
-                  <span className="stat-label">Candidatures déposées</span>
-                </div>
-                <div className="stat-card-footer">
-                  <span className="stat-trend positive">+20% ce mois</span>
-                </div>
-              </div>
-            </div>
+              {/* Cartes statistiques */}
+              <StatisticsCards stats={state.stats} unreadMessages={state.unreadMessages} />
 
-            {/* Graphique */}
-            <div className="chart-section">
-              <div className="chart-header">
-                <h3>📈 Évolution des données</h3>
-                <div className="chart-legend">
-                  <span className="legend-item students">Étudiants</span>
-                  <span className="legend-item companies">Entreprises</span>
-                  <span className="legend-item offers">Offres</span>
+              {/* Graphiques modernes avec Recharts */}
+              <div className="charts-grid">
+                <div className="chart-card">
+                  <h3>Répartition des entités</h3>
+                  <ResponsiveContainer width="100%" height={250}>
+                    <PieChart>
+                      <Pie
+                        data={chartData}
+                        dataKey="value"
+                        nameKey="name"
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={80}
+                        fill="#8884d8"
+                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      >
+                        {chartData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={['#4f46e5', '#06b6d4', '#f59e0b', '#ef4444'][index % 4]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+
+                <div className="chart-card">
+                  <h3>Évolution mensuelle (simulée)</h3>
+                  <ResponsiveContainer width="100%" height={250}>
+                    <LineChart data={[
+                      { mois: 'Jan', étudiants: 20, offres: 8 },
+                      { mois: 'Fév', étudiants: 28, offres: 12 },
+                      { mois: 'Mar', étudiants: 35, offres: 15 },
+                      { mois: 'Avr', étudiants: 42, offres: 22 },
+                      { mois: 'Mai', étudiants: 55, offres: 30 },
+                    ]}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="mois" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Line type="monotone" dataKey="étudiants" stroke="#4f46e5" />
+                      <Line type="monotone" dataKey="offres" stroke="#f59e0b" />
+                    </LineChart>
+                  </ResponsiveContainer>
                 </div>
               </div>
-              
-              <div className="bar-chart-container">
-                <div className="bar-chart">
-                  <div className="bar-chart-bars">
-                    <div className="bar-chart-bar" style={{ height: `${(stats.totalStudents || 0) * 2}px` }}>
-                      <span className="bar-value">{stats.totalStudents || 0}</span>
-                      <div className="bar-fill students"></div>
-                    </div>
-                    <div className="bar-chart-bar" style={{ height: `${(stats.totalCompanies || 0) * 3}px` }}>
-                      <span className="bar-value">{stats.totalCompanies || 0}</span>
-                      <div className="bar-fill companies"></div>
-                    </div>
-                    <div className="bar-chart-bar" style={{ height: `${(stats.totalOffers || 0) * 1.5}px` }}>
-                      <span className="bar-value">{stats.totalOffers || 0}</span>
-                      <div className="bar-fill offers"></div>
-                    </div>
-                  </div>
-                  <div className="bar-chart-labels">
-                    <span>Étudiants</span>
-                    <span>Entreprises</span>
-                    <span>Offres</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+            </section>
+          </>
         )}
 
-        {/* Section Utilisateurs */}
-        {selectedTab === 'users' && (
-          <div className="users-section">
-            <div className="section-header">
-              <h2>👥 Gestion des utilisateurs</h2>
-              <p>Gérez les comptes étudiants et entreprises</p>
-            </div>
-            
-            <div className="table-container">
-              <div className="table-header">
-                <div className="table-title">
-                  <span className="table-count">{users.length} utilisateurs</span>
-                </div>
-                <div className="table-filters">
-                  <button className="filter-btn active">Tous</button>
-                  <button className="filter-btn">Étudiants</button>
-                  <button className="filter-btn">Entreprises</button>
-                </div>
-              </div>
-              
-              <table className="users-table">
-                <thead>
-                  <tr>
-                    <th>Email</th>
-                    <th>Rôle</th>
-                    <th>Statut</th>
-                    <th>Date d'inscription</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.map(user => (
-                    <tr key={user._id}>
-                      <td>
-                        <div className="user-cell">
-                          <span className="user-avatar-small">👤</span>
-                          <span className="user-email">{user.email}</span>
-                        </div>
-                      </td>
-                      <td>
-                        <span className={`role-badge ${user.role}`}>
-                          {user.role === 'student' ? 'Étudiant' : 'Entreprise'}
-                        </span>
-                      </td>
-                      <td>
-                        <span className={`status-badge ${user.active ? 'active' : 'inactive'}`}>
-                          <span className="status-dot"></span>
-                          {user.active ? 'Actif' : 'Inactif'}
-                        </span>
-                      </td>
-                      <td>{new Date(user.createdAt).toLocaleDateString('fr-FR')}</td>
-                      <td>
-                        <div className="action-buttons">
-                          {user.active ? (
-                            <button
-                              onClick={() => handleUserAction(user._id, 'disable')}
-                              className="btn-warning"
-                            >
-                              <span className="btn-icon">⏸️</span>
-                              Suspendre
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => handleUserAction(user._id, 'enable')}
-                              className="btn-success"
-                            >
-                              <span className="btn-icon">▶️</span>
-                              Activer
-                            </button>
-                          )}
-                          <button
-                            onClick={() => handleUserAction(user._id, 'delete')}
-                            className="btn-danger"
-                          >
-                            <span className="btn-icon">🗑️</span>
-                            Supprimer
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+        {state.selectedTab === 'users' && (
+          <UsersTable
+            users={state.users}
+            onUserAction={handleUserAction}
+            onRefresh={fetchDashboardData}
+          />
         )}
 
-        {/* Section Offres */}
-        {selectedTab === 'offers' && (
-          <div className="offers-section">
-            <div className="section-header">
-              <h2>💼 Gestion des offres</h2>
-              <p>Gérez les offres de stage publiées</p>
-            </div>
-            
-            <div className="table-container">
-              <div className="table-header">
-                <div className="table-title">
-                  <span className="table-count">{offers.length} offres</span>
-                </div>
-                <div className="table-filters">
-                  <button className="filter-btn active">Toutes</button>
-                  <button className="filter-btn">Actives</button>
-                  <button className="filter-btn">Inactives</button>
-                </div>
-              </div>
-              
-              <table className="offers-table">
-                <thead>
-                  <tr>
-                    <th>Titre</th>
-                    <th>Entreprise</th>
-                    <th>Lieu</th>
-                    <th>Durée</th>
-                    <th>Statut</th>
-                    <th>Date</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {offers.map(offer => (
-                    <tr key={offer._id}>
-                      <td>
-                        <div className="offer-title">
-                          <strong>{offer.title}</strong>
-                        </div>
-                      </td>
-                      <td>{offer.companyId?.name || 'N/A'}</td>
-                      <td>
-                        <span className="location-badge">
-                          📍 {offer.location}
-                        </span>
-                      </td>
-                      <td>{offer.duration}</td>
-                      <td>
-                        <span className={`status-badge ${offer.active ? 'active' : 'inactive'}`}>
-                          <span className="status-dot"></span>
-                          {offer.active ? 'Active' : 'Inactive'}
-                        </span>
-                      </td>
-                      <td>{new Date(offer.createdAt).toLocaleDateString('fr-FR')}</td>
-                      <td>
-                        <div className="action-buttons">
-                          {offer.active ? (
-                            <button
-                              onClick={() => handleOfferAction(offer._id, 'deactivate')}
-                              className="btn-warning"
-                            >
-                              <span className="btn-icon">⏸️</span>
-                              Désactiver
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => handleOfferAction(offer._id, 'activate')}
-                              className="btn-success"
-                            >
-                              <span className="btn-icon">▶️</span>
-                              Activer
-                            </button>
-                          )}
-                          <button className="btn-info">
-                            <span className="btn-icon">👁️</span>
-                            Voir
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+        {state.selectedTab === 'offers' && (
+          <OffersTable
+            offers={state.offers}
+            onOfferAction={handleOfferAction}
+            onRefresh={fetchDashboardData}
+          />
         )}
       </main>
 
-      {/* Footer */}
       <footer className="dashboard-footer">
-        <div className="footer-content">
-          <div className="footer-left">
-            <span className="footer-text">© 2025 StageTrack Admin</span>
-          </div>
-          <div className="footer-right">
-            <Link to="/" className="footer-link">
-              <span className="footer-icon">🏠</span>
-              Retour à l'accueil
-            </Link>
-            <span className="footer-separator">•</span>
-            <span className="footer-text"></span>
-          </div>
-        </div>
+        <p>© 2025 StageTrack Admin — Tous droits réservés</p>
       </footer>
     </div>
   );
